@@ -1,0 +1,3086 @@
+Assignment 1
+
+1.	(base statement):Accept prefixt expression and construct binary tree and perform recursive and non recursive travelsal
+
+CODE:
+
+
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+struct TreeNode {
+    char val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(char v) : val(v), left(nullptr), right(nullptr) {}
+};
+
+TreeNode* constructTree(string prefixExpr) {
+    stack<TreeNode*> st;
+    for (int i = prefixExpr.size() - 1; i >= 0; --i) {
+        if (isdigit(prefixExpr[i])) {
+            st.push(new TreeNode(prefixExpr[i]));
+        } else {
+            TreeNode* node = new TreeNode(prefixExpr[i]);
+            node->left = st.top(); st.pop();
+            node->right = st.top(); st.pop();
+            st.push(node);
+        }
+    }
+    return st.top();
+}
+
+void preorderRecursive(TreeNode* root) {
+    if (!root) return;
+    cout << root->val << " ";
+    preorderRecursive(root->left);
+    preorderRecursive(root->right);
+}
+
+void preorderNonRecursive(TreeNode* root) {
+    stack<TreeNode*> st;
+    st.push(root);
+    while (!st.empty()) {
+        TreeNode* curr = st.top(); st.pop();
+        cout << curr->val << " ";
+        if (curr->right) st.push(curr->right);
+        if (curr->left) st.push(curr->left);
+    }
+}
+
+int main() {
+    string prefixExpr = "*+a-bc";
+    TreeNode* root = constructTree(prefixExpr);
+    
+    cout << "Recursive Preorder Traversal: ";
+    preorderRecursive(root);
+    cout << endl;
+    
+    cout << "Non-Recursive Preorder Traversal: ";
+    preorderNonRecursive(root);
+    cout << endl;
+
+    return 0;
+}
+
+OUTPUT: Recursive Preorder Traversal: * + a - b c 
+Non-Recursive Preorder Traversal: * + a - b c 
+
+
+
+
+
+
+
+2.Create binary tree and perform Inorder, Preorder and Postorder non recursive traversal.
+
+CODE:
+
+#include <iostream>
+#include <stack>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+TreeNode* createNode(int val) {
+    TreeNode* newNode = new TreeNode(val);
+    return newNode;
+}
+
+void inorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    stack<TreeNode*> s;
+    TreeNode* current = root;
+    while (current != NULL || !s.empty()) {
+        while (current != NULL) {
+            s.push(current);
+            current = current->left;
+        }
+        current = s.top();
+        s.pop();
+        cout << current->val << " ";
+        current = current->right;
+    }
+}
+
+void preorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    stack<TreeNode*> s;
+    s.push(root);
+    while (!s.empty()) {
+        TreeNode* current = s.top();
+        s.pop();
+        cout << current->val << " ";
+        if (current->right) s.push(current->right);
+        if (current->left) s.push(current->left);
+    }
+}
+
+void postorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    stack<TreeNode*> s1, s2;
+    s1.push(root);
+    while (!s1.empty()) {
+        TreeNode* current = s1.top();
+        s1.pop();
+        s2.push(current);
+        if (current->left) s1.push(current->left);
+        if (current->right) s1.push(current->right);
+    }
+    while (!s2.empty()) {
+        cout << s2.top()->val << " ";
+        s2.pop();
+    }
+}
+
+int main() {
+    TreeNode* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->left->right = createNode(5);
+
+    cout << "Inorder traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    cout << "Preorder traversal: ";
+    preorderTraversal(root);
+    cout << endl;
+
+    cout << "Postorder traversal: ";
+    postorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+
+
+OUTPUT:
+
+Inorder traversal: 4 2 5 1 3 
+Preorder traversal: 1 2 4 5 3 
+Postorder traversal: 4 5 2 3 1 
+
+
+
+
+3.Create binary tree. Find height of the tree and print leaf nodes. Find mirror image, print original and mirror image using level-wise printing 
+CODE:
+#include <iostream>
+#include <queue>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int v) : val(v), left(nullptr), right(nullptr) {}
+};
+
+int height(TreeNode* root) {
+    if (!root) return 0;
+    int leftHeight = height(root->left);
+    int rightHeight = height(root->right);
+    return max(leftHeight, rightHeight) + 1;
+}
+
+void printLeafNodes(TreeNode* root) {
+    if (!root) return;
+    if (!root->left && !root->right) {
+        cout << root->val << " ";
+    }
+    printLeafNodes(root->left);
+    printLeafNodes(root->right);
+}
+
+void mirror(TreeNode* root) {
+    if (!root) return;
+    mirror(root->left);
+    mirror(root->right);
+    swap(root->left, root->right);
+}
+
+void levelOrderPrint(TreeNode* root) {
+    if (!root) return;
+    queue<TreeNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        int size = q.size();
+        for (int i = 0; i < size; ++i) {
+            TreeNode* curr = q.front(); q.pop();
+            cout << curr->val << " ";
+            if (curr->left) q.push(curr->left);
+            if (curr->right) q.push(curr->right);
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+    root->right->left = new TreeNode(6);
+    root->right->right = new TreeNode(7);
+
+    cout << "Height of the tree: " << height(root) << endl;
+
+    cout << "Leaf nodes: ";
+    printLeafNodes(root);
+    cout << endl;
+
+    cout << "Original Tree:" << endl;
+    levelOrderPrint(root);
+
+    mirror(root);
+
+    cout << "Mirror Image:" << endl;
+    levelOrderPrint(root);
+
+    return 0;
+}
+
+OUTPUT:
+Height of the tree: 3
+Leaf nodes: 4 5 6 7 
+Original Tree:
+1 
+2 3 
+4 5 6 7 
+Mirror Image:
+1 
+3 2 
+7 6 5 4 
+
+
+
+
+
+4.Create binary tree and perform Inorder, Preorder and Postorder recursive traversal.
+
+CODE:
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+TreeNode* createNode(int val) {
+    TreeNode* newNode = new TreeNode(val);
+    return newNode;
+}
+
+void inorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    inorderTraversal(root->left);
+    cout << root->val << " ";
+    inorderTraversal(root->right);
+}
+
+void preorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    cout << root->val << " ";
+    preorderTraversal(root->left);
+    preorderTraversal(root->right);
+}
+
+void postorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    cout << root->val << " ";
+}
+
+int main() {
+    TreeNode* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->left->right = createNode(5);
+
+    cout << "Inorder traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    cout << "Preorder traversal: ";
+    preorderTraversal(root);
+    cout << endl;
+
+    cout << "Postorder traversal: ";
+    postorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+OUTPUT:
+
+Inorder traversal: 4 2 5 1 3 
+Preorder traversal: 1 2 4 5 3 
+Postorder traversal: 4 5 2 3 1 
+
+
+
+Assignment 2
+
+
+1. (base problem statement):   A Dictionary stores keywords & its meanings. Provide facility for adding new
+keywords, deleting keywords, and updating values of any entry. Provide a facility to
+display whole data sorted in ascending/ Descending order. Also, find how many
+maximum comparisons may be required for finding any keyword. Use Binary Search Tree
+for implementation.   
+CODE
+
+
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    string keyword;
+    string meaning;
+    Node* left;
+    Node* right;
+    Node(string k, string m) : keyword(k), meaning(m), left(nullptr), right(nullptr) {}
+};
+
+class Dictionary {
+private:
+    Node* root;
+
+    Node* insert(Node* root, string keyword, string meaning) {
+        if (!root) return new Node(keyword, meaning);
+        if (keyword < root->keyword) {
+            root->left = insert(root->left, keyword, meaning);
+        } else if (keyword > root->keyword) {
+            root->right = insert(root->right, keyword, meaning);
+        } else {
+            root->meaning = meaning; // Update meaning if keyword already exists
+        }
+        return root;
+    }
+
+    Node* findMin(Node* node) {
+        while (node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+
+    Node* remove(Node* root, string keyword) {
+        if (!root) return root;
+        if (keyword < root->keyword) {
+            root->left = remove(root->left, keyword);
+        } else if (keyword > root->keyword) {
+            root->right = remove(root->right, keyword);
+        } else {
+            if (!root->left) {
+                Node* temp = root->right;
+                delete root;
+                return temp;
+            } else if (!root->right) {
+                Node* temp = root->left;
+                delete root;
+                return temp;
+            }
+            Node* temp = findMin(root->right);
+            root->keyword = temp->keyword;
+            root->meaning = temp->meaning;
+            root->right = remove(root->right, temp->keyword);
+        }
+        return root;
+    }
+
+    int findHeight(Node* root) {
+        if (!root) return 0;
+        int leftHeight = findHeight(root->left);
+        int rightHeight = findHeight(root->right);
+        return max(leftHeight, rightHeight) + 1;
+    }
+
+public:
+    Dictionary() : root(nullptr) {}
+
+    void insert(string keyword, string meaning) {
+        root = insert(root, keyword, meaning);
+    }
+
+    void remove(string keyword) {
+        root = remove(root, keyword);
+    }
+
+    void displayAscending(Node* root) {
+        if (root) {
+            displayAscending(root->left);
+            cout << root->keyword << ": " << root->meaning << endl;
+            displayAscending(root->right);
+        }
+    }
+
+    void displayDescending(Node* root) {
+        if (root) {
+            displayDescending(root->right);
+            cout << root->keyword << ": " << root->meaning << endl;
+            displayDescending(root->left);
+        }
+    }
+
+    int getMaxComparisons(string keyword) {
+        int comparisons = 0;
+        Node* curr = root;
+        while (curr) {
+            comparisons++;
+            if (curr->keyword == keyword) {
+                return comparisons;
+            } else if (keyword < curr->keyword) {
+                curr = curr->left;
+            } else {
+                curr = curr->right;
+            }
+        }
+        return comparisons; // Keyword not found
+    }
+
+    int getHeight() {
+        return findHeight(root);
+    }
+};
+
+int main() {
+    Dictionary dict;
+
+    dict.insert("apple", "a fruit");
+    dict.insert("banana", "a fruit");
+    dict.insert("carrot", "a vegetable");
+
+    cout << "Dictionary in ascending order:" << endl;
+    dict.displayAscending(dict.getRoot());
+
+    cout << "\nDictionary in descending order:" << endl;
+    dict.displayDescending(dict.getRoot());
+
+    string searchKeyword = "apple";
+    cout << "\nMaximum comparisons for finding '" << searchKeyword << "': " << dict.getMaxComparisons(searchKeyword) << endl;
+
+    cout << "\nHeight of the dictionary: " << dict.getHeight() << endl;
+
+    return 0;
+}
+OUTPUT:
+Dictionary in ascending order:
+apple: a fruit
+banana: a fruit
+carrot: a vegetable
+
+Dictionary in descending order:
+carrot: a vegetable
+banana: a fruit
+apple: a fruit
+
+Maximum comparisons for finding 'apple': 1
+
+Height of the dictionary: 2
+
+
+
+
+BUCKET LIST
+
+2. Accept Prefix expression and construct a binary tree and perform inorder & postorder traversal.(recursive)
+
+CODE:
+
+#include <iostream>
+#include <stack>
+#include <cctype>
+using namespace std;
+
+struct TreeNode {
+    char val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(char x) : val(x), left(NULL), right(NULL) {}
+};
+
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+TreeNode* constructTree(string prefix) {
+    stack<TreeNode*> st;
+
+    for (int i = prefix.length() - 1; i >= 0; i--) {
+        if (isalnum(prefix[i])) {
+            TreeNode* node = new TreeNode(prefix[i]);
+            st.push(node);
+        } else if (isOperator(prefix[i])) {
+            TreeNode* node = new TreeNode(prefix[i]);
+            TreeNode* operand1 = st.top();
+            st.pop();
+            TreeNode* operand2 = st.top();
+            st.pop();
+            node->left = operand1;
+            node->right = operand2;
+            st.push(node);
+        }
+    }
+    return st.top();
+}
+
+void inorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    inorderTraversal(root->left);
+    cout << root->val << " ";
+    inorderTraversal(root->right);
+}
+
+void postorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    postorderTraversal(root->left);
+    postorderTraversal(root->right);
+    cout << root->val << " ";
+}
+
+int main() {
+    string prefix;
+    cout << "Enter prefix expression: ";
+    cin >> prefix;
+
+    TreeNode* root = constructTree(prefix);
+
+    cout << "Inorder traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    cout << "Postorder traversal: ";
+    postorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+OUTPUT:
+
+Enter prefix expression: -+7*45+20
+Inorder traversal: 7 + 4 * 5 - 2 + 0 
+Postorder traversal: 7 4 5 * + 2 0 + -
+
+
+
+3.Accept Prefix expression and construct a binary tree and perform inorder & postorder traversal.(non-recursive) 
+
+CODE:
+
+#include <iostream>
+#include <stack>
+#include <sstream>
+#include <string>
+using namespace std;
+
+struct TreeNode {
+    char val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(char x) : val(x), left(NULL), right(NULL) {}
+};
+
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+TreeNode* constructTree(string prefix) {
+    stack<TreeNode*> s;
+    for (int i = prefix.size() - 1; i >= 0; i--) {
+        char c = prefix[i];
+        if (isOperator(c)) {
+            TreeNode* node = new TreeNode(c);
+            node->left = s.top();
+            s.pop();
+            node->right = s.top();
+            s.pop();
+            s.push(node);
+        } else {
+            TreeNode* node = new TreeNode(c);
+            s.push(node);
+        }
+    }
+    return s.top();
+}
+
+void inorderTraversal(TreeNode* root) {
+    stack<TreeNode*> s;
+    TreeNode* current = root;
+    while (current != NULL || !s.empty()) {
+        while (current != NULL) {
+            s.push(current);
+            current = current->left;
+        }
+        current = s.top();
+        s.pop();
+        cout << current->val << " ";
+        current = current->right;
+    }
+}
+
+void postorderTraversal(TreeNode* root) {
+    if (root == NULL) return;
+    stack<TreeNode*> s1, s2;
+    s1.push(root);
+    while (!s1.empty()) {
+        TreeNode* current = s1.top();
+        s1.pop();
+        s2.push(current);
+        if (current->left) s1.push(current->left);
+        if (current->right) s1.push(current->right);
+    }
+    while (!s2.empty()) {
+        cout << s2.top()->val << " ";
+        s2.pop();
+    }
+}
+
+int main() {
+    string prefix;
+    cout << "Enter the prefix expression: ";
+    getline(cin, prefix);
+
+    TreeNode* root = constructTree(prefix);
+
+    cout << "Inorder traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    cout << "Postorder traversal: ";
+    postorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+
+
+
+OUTPUT:
+
+Enter prefix expression: -+7*45+20
+Inorder traversal: 7 + 4 * 5 - 2 + 0 
+Postorder traversal: 7 4 5 * + 2 0 + - 
+
+
+
+4.Accept Postfix expression and construct a binary tree and perform inorder & preorder traversal.(recursive)
+
+CODE:
+
+
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+// Binary tree node structure
+struct TreeNode {
+    char data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(char value) : data(value), left(nullptr), right(nullptr) {}
+};
+
+class BinaryTree {
+public:
+    // Function to construct a binary tree from a postfix expression
+    TreeNode* constructTreeFromPostfix(const string& postfix) {
+        stack<TreeNode*> st;
+        TreeNode* root = nullptr;
+
+        for (char ch : postfix) {
+            if (isOperand(ch)) {
+                TreeNode* newNode = new TreeNode(ch);
+                st.push(newNode);
+            } else {
+                TreeNode* operand2 = st.top();
+                st.pop();
+                TreeNode* operand1 = st.top();
+                st.pop();
+
+                TreeNode* newNode = new TreeNode(ch);
+                newNode->right = operand2;
+                newNode->left = operand1;
+
+                st.push(newNode);
+            }
+        }
+
+        root = st.top();
+        st.pop();
+
+        return root;
+    }
+
+    // Recursive function for inorder traversal
+    void inorderTraversal(TreeNode* root) {
+        if (root) {
+            inorderTraversal(root->left);
+            cout << root->data << " ";
+            inorderTraversal(root->right);
+        }
+    }
+
+    // Recursive function for preorder traversal
+    void preorderTraversal(TreeNode* root) {
+        if (root) {
+            cout << root->data << " ";
+            preorderTraversal(root->left);
+            preorderTraversal(root->right);
+        }
+    }
+
+private:
+    // Helper function to check if a character is an operand
+    bool isOperand(char ch) {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+    }
+};
+
+int main() {
+    BinaryTree tree;
+
+    // Constructing binary tree from postfix expression "ab+ef*g*-"
+    string postfixExpression = "ab+ef*g*-";
+    TreeNode* root = tree.constructTreeFromPostfix(postfixExpression);
+
+    // Inorder traversal
+    cout << "Inorder Traversal: ";
+    tree.inorderTraversal(root);
+    cout << endl;
+
+    // Preorder traversal
+    cout << "Preorder Traversal: ";
+    tree.preorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+OUTPUT:
+Inorder Traversal: a+b-e*f*g
+Preorder Traversal: -+ab*efg
+
+
+
+
+
+
+Assignment 3
+
+1.	Create Binary Search Tree(BST).Find height of the tree and print leaf nodes. Find mirror image, print original and mirror image using level-wise printing.
+
+CODE:
+#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+// Binary tree node structure
+struct TreeNode {
+    char data;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(char d) : data(d), left(nullptr), right(nullptr) {}
+};
+
+// Function to check if character is an operator
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+// Function to construct binary tree from postfix expression
+TreeNode* constructTree(string postfix) {
+    stack<TreeNode*> st;
+
+    for (char c : postfix) {
+        if (isalnum(c)) { // Operand
+            TreeNode* node = new TreeNode(c);
+            st.push(node);
+        } else { // Operator
+            TreeNode* rightOperand = st.top();
+            st.pop();
+            TreeNode* leftOperand = st.top();
+            st.pop();
+
+            TreeNode* node = new TreeNode(c);
+            node->right = rightOperand;
+            node->left = leftOperand;
+
+            st.push(node);
+        }
+    }
+
+    return st.top();
+}
+
+// Recursive inorder traversal
+void inorder(TreeNode* root) {
+    if (root) {
+        inorder(root->left);
+        cout << root->data << " ";
+        inorder(root->right);
+    }
+}
+
+// Recursive preorder traversal
+void preorder(TreeNode* root) {
+    if (root) {
+        cout << root->data << " ";
+        preorder(root->left);
+        preorder(root->right);
+    }
+}
+
+int main() {
+    // Accept postfix expression
+    string postfix;
+    cout << "Enter postfix expression: ";
+    cin >> postfix;
+
+    // Construct binary tree
+    TreeNode* root = constructTree(postfix);
+
+    // Inorder traversal
+    cout << "Inorder traversal: ";
+    inorder(root);
+    cout << endl;
+
+    // Preorder traversal
+    cout << "Preorder traversal: ";
+    preorder(root);
+    cout << endl;
+
+    return 0;
+}
+
+OUTPUT:
+
+Enter postfix expression: AB+C*
+Inorder traversal: A + B * C 
+Preorder traversal: * + A B C 
+
+
+
+
+2.Construct Binary Search Tree and find the min and max value of BST.
+CODE:
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+TreeNode* insert(TreeNode* root, int val) {
+    if (root == NULL) {
+        return new TreeNode(val);
+    }
+    if (val < root->val) {
+        root->left = insert(root->left, val);
+    } else if (val > root->val) {
+        root->right = insert(root->right, val);
+    }
+    return root;
+}
+
+int findMin(TreeNode* root) {
+    if (root == NULL) {
+        cout << "BST is empty." << endl;
+        return -1; // Return -1 if the BST is empty
+    }
+    while (root->left != NULL) {
+        root = root->left;
+    }
+    return root->val;
+}
+
+int findMax(TreeNode* root) {
+    if (root == NULL) {
+        cout << "BST is empty." << endl;
+        return -1; // Return -1 if the BST is empty
+    }
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    return root->val;
+}
+
+int main() {
+    TreeNode* root = NULL;
+    root = insert(root, 10);
+    insert(root, 5);
+    insert(root, 15);
+    insert(root, 3);
+    insert(root, 8);
+    insert(root, 12);
+    insert(root, 18);
+
+    cout << "Minimum value in BST: " << findMin(root) << endl;
+
+    cout << "Maximum value in BST: " << findMax(root) << endl;
+
+    return 0;
+}
+
+OUTPUT:
+
+Minimum value in BST: 3
+Maximum value in BST: 18
+
+
+
+3.Creat a BST and find inorder sucessor and inorder predecessor of specific node.
+
+CODE:
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+TreeNode* insert(TreeNode* root, int val) {
+    if (root == NULL) {
+        return new TreeNode(val);
+    }
+    if (val < root->val) {
+        root->left = insert(root->left, val);
+    } else if (val > root->val) {
+        root->right = insert(root->right, val);
+    }
+    return root;
+}
+
+TreeNode* inorderSuccessor(TreeNode* root, TreeNode* target) {
+    TreeNode* successor = NULL;
+    while (root != NULL) {
+        if (target->val < root->val) {
+            successor = root;
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    return successor;
+}
+
+TreeNode* inorderPredecessor(TreeNode* root, TreeNode* target) {
+    TreeNode* predecessor = NULL;
+    while (root != NULL) {
+        if (target->val > root->val) {
+            predecessor = root;
+            root = root->right;
+        } else {
+            root = root->left;
+        }
+    }
+    return predecessor;
+}
+
+int main() {
+    TreeNode* root = NULL;
+    root = insert(root, 10);
+    insert(root, 5);
+    insert(root, 15);
+    insert(root, 3);
+    insert(root, 8);
+    insert(root, 12);
+    insert(root, 18);
+
+    TreeNode* target = root->right->left; // Example node
+    TreeNode* successor = inorderSuccessor(root, target);
+    TreeNode* predecessor = inorderPredecessor(root, target);
+
+    cout << "Inorder successor of " << target->val << ": ";
+    if (successor)
+        cout << successor->val << endl;
+    else
+        cout << "NULL" << endl;
+
+    cout << "Inorder predecessor of " << target->val << ": ";
+    if (predecessor)
+        cout << predecessor->val << endl;
+    else
+        cout << "NULL" << endl;
+
+    return 0;
+}
+
+
+
+OUTPUT:
+
+Inorder successor of 12: 15
+Inorder predecessor of 12: 10
+
+
+4.Construct a binary search tree by accepting at least 5 numbers from user and write the definition of function that returns the constructed binary search tree is height balanced or not.
+
+CODE:
+
+
+#include <iostream>
+#include <queue>
+using namespace std;
+
+// Binary tree node structure
+struct TreeNode {
+    int data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(int value) : data(value), left(nullptr), right(nullptr) {}
+};
+
+class BinaryTree {
+public:
+    // Function to insert a node into the binary search tree
+    TreeNode* insert(TreeNode* root, int value) {
+        if (root == nullptr) {
+            return new TreeNode(value);
+        }
+
+        if (value < root->data) {
+            root->left = insert(root->left, value);
+        } else {
+            root->right = insert(root->right, value);
+        }
+
+        return root;
+    }
+
+    // Function to calculate the height of a binary tree
+    int getHeight(TreeNode* root) {
+        if (root == nullptr) {
+            return 0;
+        }
+
+        int leftHeight = getHeight(root->left);
+        int rightHeight = getHeight(root->right);
+
+        return max(leftHeight, rightHeight) + 1;
+    }
+
+    // Function to check if a binary tree is height-balanced
+    bool isBalanced(TreeNode* root) {
+        if (root == nullptr) {
+            return true;
+        }
+
+        int leftHeight = getHeight(root->left);
+        int rightHeight = getHeight(root->right);
+
+        return abs(leftHeight - rightHeight) <= 1 && isBalanced(root->left) && isBalanced(root->right);
+    }
+};
+
+int main() {
+    BinaryTree tree;
+    TreeNode* root = nullptr;
+
+    int num;
+    cout << "Enter at least 5 numbers to construct the binary search tree:" << endl;
+    for (int i = 0; i < 5; ++i) {
+        cin >> num;
+        root = tree.insert(root, num);
+    }
+
+    cout << "Binary search tree constructed." << endl;
+
+    if (tree.isBalanced(root)) {
+        cout << "The binary search tree is height-balanced." << endl;
+    } else {
+        cout << "The binary search tree is not height-balanced." << endl;
+    }
+
+    return 0;
+}
+
+
+OUTPUT:
+Enter at least 5 numbers to construct the binary search tree:
+5 3 7 2 4
+Binary search tree constructed.
+The binary search tree is height-balanced.
+
+
+
+
+Assignment 4
+
+1.	Create an in-order threaded binary search tree and perform the traversals.(Single thread)
+
+CODE:
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode *left, *right;
+    bool isThreaded;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr), isThreaded(false) {}
+};
+
+TreeNode* insert(TreeNode* root, int val) {
+    TreeNode* newNode = new TreeNode(val);
+    if (!root)
+        return newNode;
+    TreeNode *cur = root, *prev = nullptr;
+    while (cur) {
+        prev = cur;
+        if (val < cur->val) {
+            if (!cur->left) {
+                cur->left = newNode;
+                newNode->right = cur;
+                newNode->isThreaded = true;
+                break;
+            }
+            cur = cur->left;
+        } else {
+            if (!cur->right || cur->isThreaded) {
+                newNode->right = cur->right;
+                cur->right = newNode;
+                cur->isThreaded = false;
+                newNode->isThreaded = true;
+                break;
+            }
+            cur = cur->right;
+        }
+    }
+    return root ? root : newNode;
+}
+
+TreeNode* search(TreeNode* root, int val) {
+    TreeNode* cur = root;
+    while (cur) {
+        if (cur->val == val)
+            return cur;
+        else if (val < cur->val)
+            cur = cur->left;
+        else {
+            if (cur->isThreaded)
+                break;
+            cur = cur->right;
+        }
+    }
+    return nullptr;
+}
+
+TreeNode* deleteLeaf(TreeNode* root, int val) {
+    TreeNode *cur = root, *prev = nullptr;
+    while (cur) {
+        if (cur->val == val) {
+            if (prev) {
+                if (prev->left == cur) {
+                    prev->left = cur->right;
+                    prev->isThreaded = true;
+                } else
+                    prev->right = cur->right;
+            } else
+                root = cur->right;
+            delete cur;
+            break;
+        } else if (val < cur->val)
+            cur = cur->left;
+        else {
+            if (cur->isThreaded)
+                break;
+            prev = cur;
+            cur = cur->right;
+        }
+    }
+    return root;
+}
+
+void inorderTraversal(TreeNode* root) {
+    TreeNode* cur = root;
+    while (cur) {
+        while (cur->left)
+            cur = cur->left;
+        cout << cur->val << " ";
+        if (cur->isThreaded)
+            cur = cur->right;
+        else {
+            while (!cur->isThreaded && cur->right)
+                cur = cur->right;
+            cur = cur->right;
+        }
+    }
+}
+
+int main() {
+    TreeNode* root = nullptr;
+    root = insert(root, 5);
+    insert(root, 3);
+    insert(root, 8);
+    insert(root, 2);
+    insert(root, 4);
+    insert(root, 7);
+    insert(root, 9);
+
+    cout << "In-order traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    int searchVal = 7;
+    TreeNode* searchResult = search(root, searchVal);
+    if (searchResult)
+        cout << "Value " << searchVal << " found in the tree." << endl;
+    else
+        cout << "Value " << searchVal << " not found in the tree." << endl;
+
+    int deleteVal = 2;
+    root = deleteLeaf(root, deleteVal);
+    cout << "In-order traversal after deleting " << deleteVal << ": ";
+    inorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+
+
+
+2.Create an in-order threaded binary search tree and perform the traversals.(Double Thread)
+
+CODE :
+
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int data;
+    TreeNode* left;
+    TreeNode* right;
+    bool isThreaded; // Indicates whether the right pointer is a thread
+    TreeNode(int val) : data(val), left(nullptr), right(nullptr), isThreaded(false) {}
+};
+
+// Function to perform Morris in-order traversal
+void morrisInOrder(TreeNode* root) {
+    TreeNode* current = root;
+    while (current != nullptr) {
+        if (current->left == nullptr) {
+            cout << current->data << " "; // Print current node's data
+            current = current->right;
+        } else {
+            // Find the rightmost node in the left subtree
+            TreeNode* predecessor = current->left;
+            while (predecessor->right != nullptr && predecessor->right != current) {
+                predecessor = predecessor->right;
+            }
+
+            // Make the current node as the right child of the rightmost node in the left subtree
+            if (predecessor->right == nullptr) {
+                predecessor->right = current;
+                current = current->left;
+            } else {
+                // If the right child of the rightmost node points back to the current node, it's a thread
+                predecessor->right = nullptr;
+                cout << current->data << " "; // Print current node's data
+                current = current->right;
+            }
+        }
+    }
+}
+
+// Function to perform in-order threading of a binary search tree
+void threadBinaryTree(TreeNode* root) {
+    if (root == nullptr) return;
+
+    TreeNode* current = root;
+    TreeNode* predecessor = nullptr;
+
+    // Find the leftmost node in the binary tree
+    while (current->left != nullptr) {
+        current = current->left;
+    }
+
+    // Thread the binary tree from the leftmost node
+    while (current != nullptr) {
+        if (current->left == nullptr) {
+            current->left = predecessor;
+            current->isThreaded = true;
+            predecessor = current;
+            current = current->right;
+        } else {
+            TreeNode* rightmost = current->left;
+            while (rightmost->right != nullptr && !rightmost->isThreaded) {
+                rightmost = rightmost->right;
+            }
+            rightmost->right = current;
+            current = current->left;
+        }
+    }
+}
+
+// Function to insert a node into a binary search tree
+TreeNode* insert(TreeNode* root, int data) {
+    if (root == nullptr) {
+        return new TreeNode(data);
+    } else if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else {
+        root->right = insert(root->right, data);
+    }
+    return root;
+}
+
+int main() {
+    TreeNode* root = nullptr;
+    root = insert(root, 5);
+    insert(root, 3);
+    insert(root, 7);
+    insert(root, 2);
+    insert(root, 4);
+    insert(root, 6);
+    insert(root, 8);
+
+    // Thread the binary tree
+    threadBinaryTree(root);
+
+    // Perform Morris in-order traversal
+    cout << "In-order traversal: ";
+    morrisInOrder(root);
+    cout << endl;
+
+    return 0;
+}
+OUTPUT:
+In-order traversal: 2 3 4 5 6 7 8
+
+
+
+3.Create a threaded binary search tree with insert, search and delete leaf node operations.
+
+CODE :
+
+#include <iostream>
+using namespace std;
+
+// Node structure for the threaded binary search tree
+struct Node {
+    int key;
+    Node* left;
+    Node* right;
+    bool isThreaded; // Indicates whether the right pointer is a thread
+
+    Node(int k) : key(k), left(nullptr), right(nullptr), isThreaded(false) {}
+};
+
+// Function to insert a new key into the threaded binary search tree
+Node* insert(Node* root, int key) {
+    if (!root) {
+        return new Node(key);
+    }
+
+    if (key < root->key) {
+        root->left = insert(root->left, key);
+        if (root->left->right == nullptr) {
+            root->left->right = root;
+            root->left->isThreaded = true;
+        }
+    } else if (key > root->key || (key == root->key && root->isThreaded)) {
+        if (root->right == nullptr || root->isThreaded) {
+            Node* newNode = new Node(key);
+            newNode->right = root->right;
+            newNode->isThreaded = root->isThreaded;
+            root->right = newNode;
+            root->isThreaded = false;
+        } else {
+            root->right = insert(root->right, key);
+        }
+    }
+    return root;
+}
+
+// Function to search for a key in the threaded binary search tree
+Node* search(Node* root, int key) {
+    while (root) {
+        if (key == root->key) {
+            return root;
+        } else if (key < root->key) {
+            root = root->left;
+        } else {
+            if (root->isThreaded) {
+                break;
+            }
+            root = root->right;
+        }
+    }
+    return nullptr;
+}
+
+// Function to find the parent of a given node
+Node* findParent(Node* root, Node* target) {
+    if (!root || !target) {
+        return nullptr;
+    }
+
+    Node* parent = nullptr;
+    while (root) {
+        if (target->key < root->key || (target->key == root->key && root->isThreaded)) {
+            parent = root;
+            root = root->left;
+        } else {
+            if (root->isThreaded) {
+                break;
+            }
+            parent = root;
+            root = root->right;
+        }
+    }
+    return parent;
+}
+
+// Function to delete a leaf node from the threaded binary search tree
+Node* deleteLeaf(Node* root, int key) {
+    Node* target = search(root, key);
+    if (!target || (target->left && target->right)) {
+        return root; // Target not found or target has children, cannot delete
+    }
+
+    Node* parent = findParent(root, target);
+    if (!parent) {
+        return nullptr; // Target is the root node, cannot delete
+    }
+
+    if (parent->left == target) {
+        parent->left = target->left;
+        parent->isThreaded = true; // Update parent's threaded status
+    } else {
+        parent->right = target->right;
+    }
+    delete target;
+    return root;
+}
+
+// Function to perform in-order traversal of the threaded binary search tree
+void inOrderTraversal(Node* root) {
+    while (root) {
+        while (root->left) {
+            root = root->left;
+        }
+        cout << root->key << " ";
+        if (root->isThreaded) {
+            root = root->right;
+        } else {
+            root = root->right;
+            while (root && !root->isThreaded) {
+                cout << root->key << " ";
+                root = root->right;
+            }
+        }
+    }
+}
+
+// Function to delete the entire threaded binary search tree
+void deleteTree(Node* root) {
+    if (root) {
+        deleteTree(root->left);
+        Node* temp = root->right;
+        while (temp && !root->isThreaded) {
+            Node* next = temp->right;
+            delete root;
+            root = temp;
+            temp = next;
+        }
+        delete root;
+    }
+}
+
+int main() {
+    Node* root = nullptr;
+
+    // Insert keys into the threaded binary search tree
+    root = insert(root, 50);
+    insert(root, 30);
+    insert(root, 70);
+    insert(root, 20);
+    insert(root, 40);
+    insert(root, 60);
+    insert(root, 80);
+
+    // Perform in-order traversal
+    cout << "In-order traversal: ";
+    inOrderTraversal(root);
+    cout << endl;
+
+    // Delete leaf node with key 40
+    root = deleteLeaf(root, 40);
+
+    // Perform in-order traversal after deletion
+    cout << "In-order traversal after deletion: ";
+    inOrderTraversal(root);
+    cout << endl;
+
+    // Delete the entire threaded binary search tree
+    deleteTree(root);
+
+    return 0;
+}
+OUTPUT:
+
+In-order traversal: 20 30 40 50 60 70 80 
+In-order traversal after deletion: 20 30 50 60 70 80 
+
+
+4.Create an inorder threaded binary search treee and perform traversals
+
+CODE: 
+
+#include <iostream>
+using namespace std;
+
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    bool isThreaded;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr), isThreaded(false) {}
+};
+
+TreeNode* insert(TreeNode* root, int val) {
+    TreeNode* newNode = new TreeNode(val);
+    if (root == nullptr) {
+        return newNode;
+    }
+    TreeNode* prev = nullptr;
+    TreeNode* current = root;
+    while (true) {
+        if (val < current->val) {
+            if (current->left == nullptr) {
+                current->left = newNode;
+                newNode->right = current;
+                newNode->isThreaded = true;
+                break;
+            }
+            current = current->left;
+        } else {
+            if (current->right == nullptr || current->isThreaded) {
+                newNode->right = current->right;
+                current->right = newNode;
+                current->isThreaded = false;
+                newNode->isThreaded = true;
+                break;
+            }
+            current = current->right;
+        }
+    }
+    return root;
+}
+
+void inorderTraversal(TreeNode* root) {
+    TreeNode* current = root;
+    while (current != nullptr) {
+        while (current->left != nullptr) {
+            current = current->left;
+        }
+        cout << current->val << " ";
+        if (current->isThreaded) {
+            current = current->right;
+        } else {
+            while (!current->isThreaded && current->right != nullptr) {
+                current = current->right;
+            }
+            current = current->right;
+        }
+    }
+}
+
+int main() {
+    TreeNode* root = nullptr;
+    root = insert(root, 5);
+    insert(root, 3);
+    insert(root, 8);
+    insert(root, 2);
+    insert(root, 4);
+    insert(root, 7);
+    insert(root, 9);
+
+    cout << "In-order traversal: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
+
+
+
+Assignment 5 
+
+1.	Represent a graph using adjacency matrix 
+
+CODE:
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjMatrix;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjMatrix.resize(numVertices, vector<int>(numVertices, 0)); 
+    }
+
+    void addEdge(int src, int dest) {
+        adjMatrix[src][dest] = 1;
+        adjMatrix[dest][src] = 1;
+    }
+
+    void printAdjMatrix() {
+        cout << "Adjacency Matrix:" << endl;
+        for (int i = 0; i < numVertices; ++i) {
+            for (int j = 0; j < numVertices; ++j) {
+                cout << adjMatrix[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 4);
+    graph.addEdge(1, 2);
+    graph.addEdge(1, 3);
+    graph.addEdge(1, 4);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 4);
+
+    graph.printAdjMatrix();
+
+    return 0;
+}
+
+OUTPUT:
+
+Adjacency Matrix:
+0 1 0 0 1 
+1 0 1 1 1 
+0 1 0 1 0 
+0 1 1 0 1 
+1 1 0 1 0 
+
+
+2.	Represent a graph using adjacency list
+
+CODE:
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjList;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjList.resize(numVertices); 
+    }
+
+    void addEdge(int src, int dest) {
+        adjList[src].push_back(dest);
+        adjList[dest].push_back(src);
+    }
+
+    void printAdjList() {
+        cout << "Adjacency List:" << endl;
+        for (int i = 0; i < numVertices; ++i) {
+            cout << "Vertex " << i << " :";
+            for (int j = 0; j < adjList[i].size(); ++j) {
+                cout << " -> " << adjList[i][j];
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 4);
+    graph.addEdge(1, 2);
+    graph.addEdge(1, 3);
+    graph.addEdge(1, 4);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 4);
+
+    graph.printAdjList();
+
+    return 0;
+}
+
+OUTPUT:
+
+Adjacency List:
+Vertex 0 : -> 1 -> 4
+Vertex 1 : -> 0 -> 2 -> 3 -> 4
+Vertex 2 : -> 1 -> 3
+Vertex 3 : -> 1 -> 2 -> 4
+Vertex 4 : -> 0 -> 1 -> 3
+
+
+
+Assignment 6
+
+1.	Create a program to represent a graph using an adjacency Matrix and perform Breadth-First Search (BFS) to systematically visit all vertices.
+  
+CODE:
+
+
+
+#include <iostream>
+#include <queue>
+#include <vector>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjMatrix;
+
+public:
+    Graph(int vertices) : numVertices(vertices) {
+        adjMatrix.resize(numVertices, vector<int>(numVertices, 0));
+    }
+
+    // Add an edge between two vertices
+    void addEdge(int src, int dest) {
+        adjMatrix[src][dest] = 1;
+        adjMatrix[dest][src] = 1; // For undirected graph
+    }
+
+    // Perform Breadth-First Search starting from a given vertex
+    void BFS(int startVertex) {
+        vector<bool> visited(numVertices, false);
+        queue<int> bfsQueue;
+
+        visited[startVertex] = true;
+        bfsQueue.push(startVertex);
+
+        cout << "Breadth-First Traversal: ";
+        while (!bfsQueue.empty()) {
+            int currentVertex = bfsQueue.front();
+            bfsQueue.pop();
+            cout << currentVertex << " ";
+
+            // Visit all adjacent vertices of the current vertex
+            for (int i = 0; i < numVertices; ++i) {
+                if (adjMatrix[currentVertex][i] == 1 && !visited[i]) {
+                    visited[i] = true;
+                    bfsQueue.push(i);
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    // Create a graph with 5 vertices
+    Graph graph(5);
+
+    // Add edges between vertices
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 2);
+    graph.addEdge(1, 3);
+    graph.addEdge(1, 4);
+    graph.addEdge(2, 4);
+
+    // Perform BFS starting from vertex 0
+    graph.BFS(0);
+
+    return 0;
+}
+OUTPUT:
+
+
+Breadth-First Traversal: 0 1 2 3 4 
+
+
+2.Create a program to represent a graph using an adjacency list and perform Breadth-First Search (BFS) to systematically visit all vertices.
+
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjList;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjList.resize(numVertices);
+    }
+
+    void addEdge(int src, int dest) {
+
+        adjList[src].push_back(dest);
+    }
+
+    void BFS(int startVertex) {
+        vector<bool> visited(numVertices, false); 
+        queue<int> que;
+        que.push(startVertex);
+        visited[startVertex] = true;
+
+        cout << "BFS Traversal starting from vertex " << startVertex << ": ";
+        while (!que.empty()) {
+            int currentVertex = que.front();
+            que.pop();
+            cout << currentVertex << " ";
+
+            for (int i = 0; i < adjList[currentVertex].size(); ++i) {
+                int neighbor = adjList[currentVertex][i];
+                if (!visited[neighbor]) {
+                    que.push(neighbor);
+                    visited[neighbor] = true;
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 2);
+    graph.addEdge(1, 3);
+    graph.addEdge(1, 4);
+    graph.addEdge(2, 4);
+    graph.addEdge(3, 4);
+
+    graph.BFS(0);
+    return 0;
+}
+
+OUTPUT:
+
+BFS Traversal starting from vertex 0: 0 1 2 3 4
+
+
+3.Create a program to represent a graph using an adjacency Matrix and perform Depth-First Search (DFS) to systematically visit all vertices.
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <stack>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjMatrix;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjMatrix.resize(numVertices, vector<int>(numVertices, 0)); // Initialize adjacency matrix with all 0s
+    }
+
+    void addEdge(int src, int dest) {
+        adjMatrix[src][dest] = 1;
+    }
+
+    void DFS(int startVertex) {
+        vector<bool> visited(numVertices, false); 
+        stack<int> stk;
+        stk.push(startVertex);
+        visited[startVertex] = true;
+
+        cout << "DFS Traversal starting from vertex " << startVertex << ": ";
+        while (!stk.empty()) {
+            int currentVertex = stk.top();
+            stk.pop();
+            cout << currentVertex << " ";
+
+            for (int i = 0; i < numVertices; ++i) {
+                if (adjMatrix[currentVertex][i] && !visited[i]) {
+                    stk.push(i);
+                    visited[i] = true;
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1);
+    graph.addEdge(0, 2);
+    graph.addEdge(1, 3);
+    graph.addEdge(1, 4);
+    graph.addEdge(2, 4);
+    graph.addEdge(3, 4);
+
+    graph.DFS(0);
+
+    return 0;
+}
+
+OUTPUT:
+
+DFS Traversal starting from vertex 0: 0 2 4 1 3 
+
+
+
+
+
+
+
+
+Assignment 7
+
+1.	Represent given graph using an adjecency matrix and find the shorest path using Dijkstra's algorithm 
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <limits>
+using namespace std;
+
+#define INF numeric_limits<int>::max()
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjMatrix;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjMatrix.resize(numVertices, vector<int>(numVertices, 0)); // Initialize adjacency matrix with all 0s
+    }
+
+    void addEdge(int src, int dest, int weight) {
+        adjMatrix[src][dest] = weight;
+    }
+
+    int minDistance(const vector<int>& dist, const vector<bool>& visited) {
+        int minDist = INF, minVertex = -1;
+        for (int v = 0; v < numVertices; ++v) {
+            if (!visited[v] && dist[v] < minDist) {
+                minDist = dist[v];
+                minVertex = v;
+            }
+        }
+        return minVertex;
+    }
+
+    void dijkstra(int src) {
+        vector<int> dist(numVertices, INF); 
+        vector<bool> visited(numVertices, false); 
+        dist[src] = 0;
+
+        for (int count = 0; count < numVertices - 1; ++count) {
+            int u = minDistance(dist, visited);
+            visited[u] = true;
+
+            for (int v = 0; v < numVertices; ++v) {
+                if (!visited[v] && adjMatrix[u][v] && dist[u] != INF && dist[u] + adjMatrix[u][v] < dist[v]) {
+                    dist[v] = dist[u] + adjMatrix[u][v];
+                }
+            }
+        }
+
+        cout << "Shortest distances from vertex " << src << ":" << endl;
+        for (int i = 0; i < numVertices; ++i) {
+            cout << "Vertex " << i << ": ";
+            if (dist[i] == INF)
+                cout << "INF" << endl;
+            else
+                cout << dist[i] << endl;
+        }
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1, 4);
+    graph.addEdge(0, 2, 8);
+    graph.addEdge(1, 2, 2);
+    graph.addEdge(1, 3, 5);
+    graph.addEdge(2, 3, 5);
+    graph.addEdge(2, 4, 9);
+    graph.addEdge(3, 4, 4);
+
+    graph.dijkstra(0);
+
+    return 0;
+}
+
+
+
+OUTPUT
+
+Shortest distances from vertex 0:
+Vertex 0: 0
+Vertex 1: 4
+Vertex 2: 6
+Vertex 3: 9
+Vertex 4: 13
+
+
+
+2.	Develop a program to model a graph using an adjacency matrix or list and employ Kruskal's algorithm to find the minimum spanning tree.
+
+CODE:
+
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Structure to represent an edge in the graph
+struct Edge {
+    int src, dest, weight;
+
+    Edge(int s, int d, int w) : src(s), dest(d), weight(w) {}
+};
+
+class Graph {
+private:
+    int numVertices;
+    vector<Edge> edges;
+
+public:
+    Graph(int vertices) : numVertices(vertices) {}
+
+    // Add an edge to the graph
+    void addEdge(int src, int dest, int weight) {
+        edges.push_back(Edge(src, dest, weight));
+    }
+
+    // Find parent of a vertex using path compression technique
+    int findParent(int vertex, vector<int>& parent) {
+        if (parent[vertex] == -1) {
+            return vertex;
+        }
+        return parent[vertex] = findParent(parent[vertex], parent);
+    }
+
+    // Union operation to merge two sets
+    void unionSets(int x, int y, vector<int>& parent, vector<int>& rank) {
+        int xRoot = findParent(x, parent);
+        int yRoot = findParent(y, parent);
+
+        if (rank[xRoot] < rank[yRoot]) {
+            parent[xRoot] = yRoot;
+        } else if (rank[xRoot] > rank[yRoot]) {
+            parent[yRoot] = xRoot;
+        } else {
+            parent[yRoot] = xRoot;
+            rank[xRoot]++;
+        }
+    }
+
+    // Kruskal's algorithm to find minimum spanning tree
+    void kruskalMST() {
+        vector<Edge> result; // Stores the edges of the minimum spanning tree
+
+        // Sort edges in non-decreasing order of weight
+        sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+            return a.weight < b.weight;
+        });
+
+        // Initialize parent and rank arrays for disjoint set union
+        vector<int> parent(numVertices, -1);
+        vector<int> rank(numVertices, 0);
+
+        int edgeCount = 0;
+        int i = 0;
+        while (edgeCount < numVertices - 1 && i < edges.size()) {
+            Edge currentEdge = edges[i++];
+
+            int srcParent = findParent(currentEdge.src, parent);
+            int destParent = findParent(currentEdge.dest, parent);
+
+            if (srcParent != destParent) {
+                result.push_back(currentEdge);
+                unionSets(srcParent, destParent, parent, rank);
+                edgeCount++;
+            }
+        }
+
+        // Output the minimum spanning tree
+        cout << "Minimum Spanning Tree (Kruskal's Algorithm):" << endl;
+        for (const Edge& edge : result) {
+            cout << edge.src << " -- " << edge.dest << "  weight: " << edge.weight << endl;
+        }
+    }
+};
+
+int main() {
+    Graph graph(6); // Create a graph with 6 vertices
+
+    // Add edges to the graph
+    graph.addEdge(0, 1, 4);
+    graph.addEdge(0, 2, 4);
+    graph.addEdge(1, 2, 2);
+    graph.addEdge(1, 3, 3);
+    graph.addEdge(1, 4, 2);
+    graph.addEdge(2, 3, 5);
+    graph.addEdge(2, 4, 4);
+    graph.addEdge(3, 4, 1);
+    graph.addEdge(3, 5, 7);
+    graph.addEdge(4, 5, 6);
+
+    // Find and output the minimum spanning tree using Kruskal's algorithm
+    graph.kruskalMST();
+
+    return 0;
+}
+
+OUTPUT:
+ 
+Minimum Spanning Tree (Kruskal's Algorithm):
+3 -- 4  weight: 1
+1 -- 4  weight: 2
+0 -- 1  weight: 4
+1 -- 2  weight: 2
+3 -- 5  weight: 7
+
+3.Create an application to represent a graph using an adjacency matrix or list and apply Prim's algorithm to determine the minimum spanning tree.
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <limits>
+using namespace std;
+
+#define INF numeric_limits<int>::max()
+
+class Graph {
+private:
+    int numVertices;
+    vector<vector<int>> adjMatrix;
+
+public:
+    Graph(int vertices) {
+        numVertices = vertices;
+        adjMatrix.resize(numVertices, vector<int>(numVertices, 0)); 
+    }
+
+    void addEdge(int src, int dest, int weight) {
+        // Assuming it's an undirected graph
+        adjMatrix[src][dest] = weight;
+        adjMatrix[dest][src] = weight;
+    }
+
+    int minKey(const vector<int>& key, const vector<bool>& mstSet) {
+        int minKey = INF, minIndex = -1;
+        for (int v = 0; v < numVertices; ++v) {
+            if (!mstSet[v] && key[v] < minKey) {
+                minKey = key[v];
+                minIndex = v;
+            }
+        }
+        return minIndex;
+    }
+
+    void printMST(const vector<int>& parent) {
+        cout << "Minimum Spanning Tree (MST):" << endl;
+        for (int v = 1; v < numVertices; ++v) {
+            cout << parent[v] << " - " << v << "  Weight: " << adjMatrix[parent[v]][v] << endl;
+        }
+    }
+
+    void primMST() {
+        vector<int> parent(numVertices); 
+        vector<int> key(numVertices, INF); 
+        vector<bool> mstSet(numVertices, false); 
+        key[0] = 0; 
+        parent[0] = -1; 
+
+        for (int count = 0; count < numVertices - 1; ++count) {
+            int u = minKey(key, mstSet);
+
+            mstSet[u] = true;
+
+            for (int v = 0; v < numVertices; ++v) {
+                if (adjMatrix[u][v] && !mstSet[v] && adjMatrix[u][v] < key[v]) {
+                    parent[v] = u;
+                    key[v] = adjMatrix[u][v];
+                }
+            }
+        }
+
+        printMST(parent);
+    }
+};
+
+int main() {
+    Graph graph(5);
+
+    graph.addEdge(0, 1, 2);
+    graph.addEdge(0, 3, 6);
+    graph.addEdge(1, 2, 3);
+    graph.addEdge(1, 3, 8);
+    graph.addEdge(1, 4, 5);
+    graph.addEdge(2, 4, 7);
+    graph.addEdge(3, 4, 9);
+
+    graph.primMST();
+
+    return 0;
+}
+
+OUTPUT:
+
+Minimum Spanning Tree (MST):
+0 - 1  Weight: 2
+1 - 2  Weight: 3
+0 - 3  Weight: 6
+1 - 4  Weight: 5
+
+
+
+
+Assignment 8
+
+1.	Create a hash table and handle the collisions using linear probing with replacement. 
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class HashTable {
+private:
+    vector<pair<string, int>> table;
+    int capacity; 
+    int size; 
+
+public:
+    HashTable(int cap) {
+        capacity = cap;
+        size = 0;
+        table.resize(capacity); 
+    }
+
+    int hashFunction(const string& key) {
+        int sum = 0;
+        for (char ch : key) {
+            sum += ch;
+        }
+        return sum % capacity;
+    }
+
+    void insert(const string& key, int value) {
+        if (size == capacity) {
+            cout << "Hash table is full. Cannot insert more elements.\n";
+            return;
+        }
+
+        int index = hashFunction(key);
+
+        while (!table[index].first.empty() && table[index].first != key) {
+            index = (index + 1) % capacity;
+        }
+
+        table[index] = make_pair(key, value);
+        size++;
+    }
+
+    int get(const string& key) {
+        int index = hashFunction(key);
+
+        while (!table[index].first.empty()) {
+            if (table[index].first == key) {
+                return table[index].second; 
+            }
+            index = (index + 1) % capacity;
+        }
+
+        cout << "Key not found.\n";
+        return -1; 
+    }
+};
+
+int main() {
+    HashTable ht(10);
+
+    ht.insert("apple", 10);
+    ht.insert("orange", 20);
+    ht.insert("banana", 30);
+
+    cout << "Value for 'apple': " << ht.get("apple") << endl;
+    cout << "Value for 'orange': " << ht.get("orange") << endl;
+    cout << "Value for 'banana': " << ht.get("banana") << endl;
+    cout << "Value for 'grape': " << ht.get("grape") << endl; // Key not found
+
+    return 0;
+}
+
+OUTPUT:
+
+Value for 'apple': 10
+Value for 'orange': 20
+Value for 'banana': 30
+Value for 'grape': Key not found.
+-1
+
+
+2.	Create a hash table and handle the collisions using Separate Chaining. 
+CODE:
+
+
+#include <iostream>
+#include <list>
+#include <vector>
+using namespace std;
+
+class HashTable {
+private:
+    int tableSize;
+    vector
+    <list<int>> table;
+
+    // Hash function to calculate the index
+    int hashFunction(int key) {
+        return key % tableSize;
+    }
+
+public:
+    // Constructor
+    HashTable(int size) : tableSize(size) {
+        table.resize(tableSize);
+    }
+
+    // Insert key into the hash table
+    void insert(int key) {
+        int index = hashFunction(key);
+        table[index].push_back(key);
+    }
+
+    // Search for key in the hash table
+    bool search(int key) {
+        int index = hashFunction(key);
+        for (int k : table[index]) {
+            if (k == key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Remove key from the hash table
+    void remove(int key) {
+        int index = hashFunction(key);
+        table[index].remove(key);
+    }
+
+    // Print the hash table
+    void display() {
+        for (int i = 0; i < tableSize; ++i) {
+            cout << i << ": ";
+            for (int key : table[i]) {
+                cout << key << " ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    HashTable ht(10); // Create a hash table with size 10
+
+    // Insert keys into the hash table
+    ht.insert(10);
+    ht.insert(20);
+    ht.insert(30);
+    ht.insert(15);
+    ht.insert(25);
+
+    // Display the hash table
+    cout << "Hash Table:" << endl;
+    ht.display();
+
+    // Search for keys in the hash table
+    cout << "Searching for keys:" << endl;
+    cout << "Key 20 found: " << (ht.search(20) ? "Yes" : "No") << endl;
+    cout << "Key 40 found: " << (ht.search(40) ? "Yes" : "No") << endl;
+
+    // Remove keys from the hash table
+    ht.remove(20);
+    ht.remove(30);
+
+    // Display the hash table after removal
+    cout << "\nHash Table after removal:" << endl;
+    ht.display();
+
+    return 0;
+}
+OUTPUT:
+Hash Table:
+0: 10 20 30 
+1: 
+2: 
+3: 15 25 
+4: 
+5: 
+6: 
+7: 
+8: 
+9: 
+Searching for keys:
+Key 20 found: Yes
+Key 40 found: No
+
+Hash Table after removal:
+0: 10 
+1: 
+2: 
+3: 15 25 
+4: 
+5: 
+6: 
+7: 
+8: 
+9: 
+
+
+
+3.	Create a hash table and handle the collisions using linear probing without replacement.
+
+CODE:
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class HashTable {
+private:
+    vector<pair<int, string>> table;
+    int capacity;
+    int size;
+
+    int hash(int key) {
+        return key % capacity;
+    }
+
+    int probe(int index) {
+        return (index + 1) % capacity;
+    }
+
+public:
+    HashTable(int capacity) : capacity(capacity), size(0) {
+        table.resize(capacity, make_pair(-1, "")); 
+    }
+    void insert(int key, const string& value) {
+        int index = hash(key);
+        int originalIndex = index;
+
+        while (table[index].first != -1 && table[index].first != key) {
+            index = probe(index);
+
+            if (index == originalIndex) {
+                cout << "Hash table is full. Cannot insert key " << key << endl;
+                return;
+            }
+        }
+
+        table[index] = make_pair(key, value);
+        size++;
+    }
+
+    string get(int key) {
+        int index = hash(key);
+        int originalIndex = index;
+
+        while (table[index].first != -1 && table[index].first != key) {
+            index = probe(index);
+
+            if (index == originalIndex) {
+                return "Key not found";
+            }
+        }
+
+        if (table[index].first == key) {
+            return table[index].second;
+        } else {
+            return "Key not found";
+        }
+    }
+
+    void remove(int key) {
+        int index = hash(key);
+        int originalIndex = index;
+
+        while (table[index].first != -1 && table[index].first != key) {
+            index = probe(index);
+
+            if (index == originalIndex) {
+                cout << "Key " << key << " not found" << endl;
+                return;
+            }
+        }
+
+        if (table[index].first == key) {
+            table[index] = make_pair(-1, "");
+            size--;
+            cout << "Key " << key << " removed" << endl;
+        } else {
+            cout << "Key " << key << " not found" << endl;
+        }
+    }
+
+    void display() {
+        cout << "Hash Table:" << endl;
+        for (int i = 0; i < capacity; ++i) {
+            if (table[i].first != -1) {
+                cout << "[" << table[i].first << ", " << table[i].second << "]" << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    HashTable ht(10);
+
+    ht.insert(5, "Alice");
+    ht.insert(15, "Bob");
+    ht.insert(25, "Charlie");
+    ht.insert(35, "David");
+
+    ht.display();
+
+    cout << "Value for key 15: " << ht.get(15) << endl;
+    cout << "Value for key 20: " << ht.get(20) << endl;
+
+    ht.remove(15);
+    ht.remove(20);
+
+    ht.display();
+
+    return 0;
+}
+
+OUTPUT:
+Hash Table:
+[5, Alice]
+[15, Bob]
+[25, Charlie]
+[35, David]
+Value for key 15: Bob
+Value for key 20: Key not found
+Key 15 removed
+Key 20 not found
+Hash Table:
+[5, Alice]
+[25, Charlie]
+[35, David]
+
+
+
+Assignment 9
+
+1.	Sort given set of elements in ascending using min heap .  
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <queue> 
+using namespace std;
+
+void heapSort(vector<int>& arr) {
+
+    priority_queue<int, vector<int>, greater<int>> minHeap;
+
+    for (int num : arr) {
+        minHeap.push(num);
+    }
+
+    int index = 0;
+    while (!minHeap.empty()) {
+        arr[index++] = minHeap.top(); 
+        minHeap.pop(); 
+    }
+}
+
+void printArray(const vector<int>& arr) {
+    for (int num : arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    vector<int> elements = {5, 2, 9, 1, 5, 6};
+    
+    cout << "Original array:" << endl;
+    printArray(elements);
+
+    heapSort(elements);
+
+    cout << "Array after sorting in ascending order:" << endl;
+    printArray(elements);
+
+    return 0;
+}
+
+
+OUTPUT:
+
+Original array:
+5 2 9 1 5 6 
+Array after sorting in ascending order:
+1 2 5 5 6 9
+
+
+2.	Sort given set of elements in descending using max heap .
+
+CODE:
+
+#include <iostream>
+#include <vector>
+#include <queue> 
+using namespace std;
+
+void heapSortDescending(vector<int>& arr) {
+
+    priority_queue<int> maxHeap;
+
+    for (int num : arr) {
+        maxHeap.push(num);
+    }
+
+    int index = 0;
+    while (!maxHeap.empty()) {
+        arr[index++] = maxHeap.top(); 
+        maxHeap.pop(); 
+    }
+}
+
+void printArray(const vector<int>& arr) {
+    for (int num : arr) {
+        cout << num << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    vector<int> elements = {5, 2, 9, 1, 5, 6};
+    
+    cout << "Original array:" << endl;
+    printArray(elements);
+    heapSortDescending(elements);
+
+    cout << "Array after sorting in descending order:" << endl;
+    printArray(elements);
+
+    return 0;
+}
+
+
+OUTPUT:
+
+Original array:
+5 2 9 1 5 6 
+Array after sorting in descending order:
+9 6 5 5 2 1
+
+
+
+Assignment 10
+
+1.	Implement Simple Index File.
+CODE:
+
+#include <iostream>
+#include <unordered_map>
+#include <string>
+using namespace std;
+
+class SimpleIndexFile {
+private:
+    unordered_map<string, int> indexMap;
+
+public:
+    void insert(const string& key, int position) {
+        indexMap[key] = position;
+    }
+
+    int getPosition(const string& key) {
+        if (indexMap.find(key) != indexMap.end()) {
+            return indexMap[key];
+        } else {
+            return -1; 
+        }
+    }
+    void printIndex() {
+        cout << "Index Contents:" << endl;
+        for (const auto& entry : indexMap) {
+            cout << "Key: " << entry.first << ", Position: " << entry.second << endl;
+        }
+    }
+};
+
+int main() {
+    SimpleIndexFile index;
+
+    index.insert("apple", 100);
+    index.insert("orange", 200);
+    index.insert("banana", 300);
+
+    cout << "Position for 'apple': " << index.getPosition("apple") << endl;
+    cout << "Position for 'grape': " << index.getPosition("grape") << endl;
+
+    index.printIndex();
+
+    return 0;
+}
+
+OUTPUT:
+
+Position for 'apple': 100
+Position for 'grape': -1
+Index Contents:
+Key: banana, Position: 300
+Key: orange, Position: 200
+Key: apple, Position: 100
+
+
+ 
+2.Company maintains employee information as employee ID, name, designation and salary. Allow user to add, delete 
+information of employee. Display information of particular employee. If employee does not exist an appropriate 
+message is displayed. If it is, then the system displays the employee details. Use sequential file to maintain the data. 
+
+
+CODE:
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+struct Employee {
+    int employeeId;
+    string name;
+    string designation;
+    float salary;
+};
+
+void addEmployee(const Employee& emp) {
+    ofstream file("employee_data.txt", ios::app);
+    if (file.is_open()) {
+        file << emp.employeeId << "," << emp.name << "," << emp.designation << "," << emp.salary << endl;
+        file.close();
+        cout << "Employee added successfully." << endl;
+    } else {
+        cerr << "Unable to open file." << endl;
+    }
+}
+
+void deleteEmployee(int employeeId) {
+    ifstream inFile("employee_data.txt");
+    ofstream outFile("temp.txt");
+
+    int id;
+    string name, designation;
+    float salary;
+    bool found = false;
+
+    while (inFile >> id >> name >> designation >> salary) {
+        if (id != employeeId) {
+            outFile << id << " " << name << " " << designation << " " << salary << endl;
+        } else {
+            found = true;
+        }
+    }
+    inFile.close();
+    outFile.close();
+
+    remove("employee_data.txt");
+    rename("temp.txt", "employee_data.txt");
+
+    if (found) {
+        cout << "Employee deleted successfully." << endl;
+    } else {
+        cout << "Employee not found." << endl;
+    }
+}
+
+void displayEmployee(int employeeId) {
+    ifstream file("employee_data.txt");
+    if (file.is_open()) {
+        int id;
+        string name, designation;
+        float salary;
+        bool found = false;
+        while (file >> id >> name >> designation >> salary) {
+            if (id == employeeId) {
+                cout << "Employee ID: " << id << endl;
+                cout << "Name: " << name << endl;
+                cout << "Designation: " << designation << endl;
+                cout << "Salary: " << salary << endl;
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            cout << "Employee not found." << endl;
+        }
+        file.close();
+    } else {
+        cerr << "Unable to open file." << endl;
+    }
+}
+
+int main() {
+    int choice;
+    while (true) {
+        cout << "\n1. Add Employee\n2. Delete Employee\n3. Display Employee\n4. Exit\nEnter your choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1: {
+                Employee emp;
+                cout << "Enter Employee ID: ";
+                cin >> emp.employeeId;
+                cout << "Enter Name: ";
+                cin >> emp.name;
+                cout << "Enter Designation: ";
+                cin >> emp.designation;
+                cout << "Enter Salary: ";
+                cin >> emp.salary;
+                addEmployee(emp);
+                break;
+            }
+            case 2: {
+                int id;
+                cout << "Enter Employee ID to delete: ";
+                cin >> id;
+                deleteEmployee(id);
+                break;
+            }
+            case 3: {
+                int id;
+                cout << "Enter Employee ID to display: ";
+                cin >> id;
+                displayEmployee(id);
+                break;
+            }
+            case 4:
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    }
+    return 0;
+}
+
+OUTPUT:
+
+1. Add Employee
+2. Delete Employee
+3. Display Employee
+4. Exit
+Enter your choice: 2
+Enter Employee ID to delete: 12
+Employee not found.
+
+
+2.	Department maintains a student information. The file contains roll number, name, division and address. Write a program to create a indexed sequential file to store and maintain student data. It should allow the user to add, delete information of student. Display information of particular student. If record of student does not exist an appropriate message is displayed. If student record is found it should display the student details. Use Indexed Sequential File to maintain the data. 
+
+
+
+CODE:
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct Student {
+    int rollNumber;
+    string name;
+    string division;
+    string address;
+};
+
+class IndexedSequentialFile {
+private:
+    string dataFileName;
+    string indexFileName;
+
+public:
+    IndexedSequentialFile(const string& dataFile, const string& indexFile)
+        : dataFileName(dataFile), indexFileName(indexFile) {}
+
+    // Add student record to the data file and update index file
+    void addStudent(const Student& student) {
+        ofstream dataFile(dataFileName, ios::app | ios::binary);
+        ofstream indexFile(indexFileName, ios::app | ios::binary | ios::ate);
+
+        int position = dataFile.tellp();
+        dataFile.write(reinterpret_cast<const char*>(&student), sizeof(Student));
+
+        indexFile.write(reinterpret_cast<const char*>(&student.rollNumber), sizeof(int));
+        indexFile.write(reinterpret_cast<const char*>(&position), sizeof(int));
+
+        dataFile.close();
+        indexFile.close();
+    }
+
+    // Delete student record based on roll number
+    void deleteStudent(int rollNumber) {
+        ifstream indexFile(indexFileName, ios::binary);
+        ofstream tempIndex("tempIndex.dat", ios::binary);
+        ifstream dataFile(dataFileName, ios::binary);
+        ofstream tempData("tempData.dat", ios::binary);
+
+        int indexRoll, indexPosition;
+        while (indexFile.read(reinterpret_cast<char*>(&indexRoll), sizeof(int)) &&
+               indexFile.read(reinterpret_cast<char*>(&indexPosition), sizeof(int))) {
+            if (indexRoll != rollNumber) {
+                tempIndex.write(reinterpret_cast<const char*>(&indexRoll), sizeof(int));
+                tempIndex.write(reinterpret_cast<const char*>(&indexPosition), sizeof(int));
+            } else {
+                // Mark record as deleted in data file by updating rollNumber to -1
+                Student student;
+                dataFile.seekg(indexPosition);
+                dataFile.read(reinterpret_cast<char*>(&student), sizeof(Student));
+                student.rollNumber = -1;
+                tempData.write(reinterpret_cast<const char*>(&student), sizeof(Student));
+            }
+        }
+
+        indexFile.close();
+        tempIndex.close();
+        dataFile.close();
+        tempData.close();
+
+        // Replace original files with temp files
+        remove(dataFileName.c_str());
+        rename("tempData.dat", dataFileName.c_str());
+        remove(indexFileName.c_str());
+        rename("tempIndex.dat", indexFileName.c_str());
+    }
+
+    // Display student details based on roll number
+    void displayStudent(int rollNumber) {
+        ifstream indexFile(indexFileName, ios::binary);
+        ifstream dataFile(dataFileName, ios::binary);
+
+        int indexRoll, indexPosition;
+        while (indexFile.read(reinterpret_cast<char*>(&indexRoll), sizeof(int)) &&
+               indexFile.read(reinterpret_cast<char*>(&indexPosition), sizeof(int))) {
+            if (indexRoll == rollNumber) {
+                Student student;
+                dataFile.seekg(indexPosition);
+                dataFile.read(reinterpret_cast<char*>(&student), sizeof(Student));
+
+                if (student.rollNumber != -1) {
+                    cout << "Roll Number: " << student.rollNumber << endl;
+                    cout << "Name: " << student.name << endl;
+                    cout << "Division: " << student.division << endl;
+                    cout << "Address: " << student.address << endl;
+                    return;
+                }
+            }
+        }
+
+        cout << "Student record with Roll Number " << rollNumber << " not found." << endl;
+
+        indexFile.close();
+        dataFile.close();
+    }
+};
+
+int main() {
+    IndexedSequentialFile file("student_data.dat", "student_index.dat");
+
+    // Add some sample student records
+    Student student1 = {101, "John Doe", "A", "123 Main St"};
+    Student student2 = {102, "Jane Smith", "B", "456 Elm St"};
+    file.addStudent(student1);
+    file.addStudent(student2);
+
+    // Display student details
+    cout << "Student details for Roll Number 101:" << endl;
+    file.displayStudent(101);
+
+    // Delete student record
+    file.deleteStudent(102);
+
+    // Display deleted student details
+    cout << "Student details for Roll Number 102 after deletion:" << endl;
+    file.displayStudent(102);
+
+    return 0;
+}
+OUTPUT:
+
+
+
+
